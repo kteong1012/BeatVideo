@@ -1,0 +1,29 @@
+<module name="Game">
+    <enum name="SideNoteDirection">
+        <var name="Left" alias="左"/>
+        <var name="Right" alias="右"/>
+    </enum>
+
+    <bean name="NoteUnit">
+        <var name="time_ms" type="int" comment="时间，毫秒"/>
+        <var name="effect" type="string" comment="特效"/>
+        <var name="sound" type="string" comment="音效"/>
+        <var name="score" type="int" comment="分数"/>
+        <!-- 侧边音符 -->
+        <bean name="SideNoteUnit" alias="侧边音符">
+            <var name="position" type="vector2" comment="位置，像素坐标"/>
+            <var name="direction" type="SideNoteDirection" comment="方向"/>
+            <var name="speed" type="int" comment="速度"/>
+            <var name="duration_ms" type="int" comment="持续时间"/>
+        </bean>
+        <!-- 轨道音符 -->
+        <bean name="TrackNoteUnit" alias="轨道音符">
+            <var name="start_position" type="vector2" comment="起始位置，像素坐标"/>
+            <var name="end_position" type="vector2" comment="结束位置，像素坐标"/>
+            <var name="count" type="int" comment="音符数量"/>
+            <var name="duration_ms" type="int" comment="持续时间"/>
+        </bean>
+    </bean>
+
+    <table name="TbLevelConfig" value="LevelConfig" input="Level.xlsx" readSchemaFromFile="1"/>
+</module>
