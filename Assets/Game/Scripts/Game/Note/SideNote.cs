@@ -9,10 +9,12 @@ public class SideNote : Note
 {
     private static ResourcesGameObjectPool _clickEffectPool = new ResourcesGameObjectPool("Effects/Click");
     private TweenerCore<Vector3, Vector3, VectorOptions> _tween;
+    private bool _active;
 
     public SideNoteUnit NoteUnit { get; set; }
     public override void Show()
     {
+        _active = true;
         var speed = NoteUnit.Speed;
         var direction = NoteUnit.Direction;
         var length = direction switch
@@ -24,6 +26,7 @@ public class SideNote : Note
         var flyTime = length / speed;
         _tween?.Kill();
         _tween = transform.DOLocalMoveX(NoteUnit.Position.x, flyTime);
+        WaitToFadeOut().Forget();
     }
 
     protected override void OnClickNote()
@@ -36,13 +39,30 @@ public class SideNote : Note
         OnClick();
     }
 
+
+    private async UniTask WaitToFadeOut()
+    {
+        var durationMs = NoteUnit.DurationMs;
+        await UniTask.Delay(durationMs);
+
+        if (_active)
+        {
+            Pool.Release(gameObject);
+            _active = false;
+        }
+    }
     private void OnClick()
     {
         var effectGob = _clickEffectPool.Get(transform.parent);
         var effect = effectGob.GetComponent<NoteClickEffect>();
         effect.Pool = _clickEffectPool;
         effect.transform.position = transform.position;
-        Pool.Release(gameObject);
+
+        if (_active)
+        {
+            Pool.Release(gameObject);
+            _active = false;
+        }
     }
 
     private void OnDestroy()
