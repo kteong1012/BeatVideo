@@ -7,6 +7,7 @@ using UnityEngine;
 
 public class SideNote : Note
 {
+    private static ResourcesGameObjectPool _clickEffectPool = new ResourcesGameObjectPool("Effects/Click");
     private TweenerCore<Vector3, Vector3, VectorOptions> _tween;
 
     public SideNoteUnit NoteUnit { get; set; }
@@ -21,6 +22,7 @@ public class SideNote : Note
             _ => 0f
         };
         var flyTime = length / speed;
+        _tween?.Kill();
         _tween = transform.DOLocalMoveX(NoteUnit.Position.x, flyTime);
     }
 
@@ -36,10 +38,11 @@ public class SideNote : Note
 
     private void OnClick()
     {
-        var clickPrefab = Resources.Load<GameObject>("Effects/Click");
-        var gob = Instantiate(clickPrefab, transform);
-        gob.transform.SetParent(transform.parent);
-        Destroy(gameObject);
+        var effectGob = _clickEffectPool.Get(transform.parent);
+        var effect = effectGob.GetComponent<NoteClickEffect>();
+        effect.Pool = _clickEffectPool;
+        effect.transform.position = transform.position;
+        Pool.Release(gameObject);
     }
 
     private void OnDestroy()

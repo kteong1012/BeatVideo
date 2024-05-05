@@ -1,9 +1,13 @@
 ﻿using Cysharp.Threading.Tasks;
 using Game.Cfg.Game;
 using UnityEngine;
+
+
 public class SideNoteCreator : NoteCreator
 {
+    private static ResourcesGameObjectPool _sideNotePool = new ResourcesGameObjectPool("Prefabs/SideNote");
     private SideNoteUnit _sideNoteUnit;
+
     public override async UniTask Create(NoteUnit noteUnit, Transform parent)
     {
         _sideNoteUnit = (SideNoteUnit)noteUnit;
@@ -18,8 +22,7 @@ public class SideNoteCreator : NoteCreator
         var flyTimeMs = length / speed * 1000;
         var showTimeMs = _sideNoteUnit.TimeMs - flyTimeMs;
         await UniTask.Delay((int)showTimeMs);
-        var prefab = Resources.Load<GameObject>("Prefabs/SideNote");
-        var gob = Object.Instantiate(prefab, parent);
+        var gob = _sideNotePool.Get(parent);
         var startPostion = direction switch
         {
             SideNoteDirection.Left => new Vector3(420, _sideNoteUnit.Position.y, 0),
@@ -28,6 +31,7 @@ public class SideNoteCreator : NoteCreator
         };
         gob.transform.localPosition = startPostion;
         var note = gob.GetComponent<SideNote>();
+        note.Pool = _sideNotePool;
         note.NoteUnit = _sideNoteUnit;
         note.Show();
     }

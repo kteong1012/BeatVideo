@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class TrackNote : Note
 {
+    private static ResourcesGameObjectPool _clickEffectPool = new ResourcesGameObjectPool("Effects/Click");
     public TrackNoteUnit NoteUnit { get; set; }
     public override void Show()
     {
@@ -22,9 +23,10 @@ public class TrackNote : Note
 
     private void OnClick()
     {
-        var clickPrefab = Resources.Load<GameObject>("Effects/Click");
-        var gob = Instantiate(clickPrefab, transform);
-        gob.transform.SetParent(transform.parent);
-        Destroy(gameObject);
+        var effectGob = _clickEffectPool.Get(transform.parent);
+        var effect = effectGob.GetComponent<NoteClickEffect>();
+        effect.transform.position = transform.position;
+        effect.Pool = _clickEffectPool;
+        Pool.Release(gameObject);
     }
 }

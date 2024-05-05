@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class NoteClickEffect : MonoBehaviour
 {
+    public ResourcesGameObjectPool Pool { get; set; }
     private void Awake()
     {
         FadeOut().Forget();
@@ -11,6 +12,6 @@ public class NoteClickEffect : MonoBehaviour
     private async UniTask FadeOut()
     {
         await UniTask.Delay(500);
-        Destroy(gameObject);
+        Pool.Release(gameObject);
     }
 }
