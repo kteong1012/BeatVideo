@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fd3eb9441d9d6f408118da3730cd393, type: 3}
+  m_Name: LevelConfig
+  m_EditorClassIdentifier: 
+  Video: {fileID: 32900000, guid: 705a76faf0e62834e83efc0cc32affbd, type: 3}
+  Notes:
+  - NoteType: 0
+    TimeMs: 3000
+    Score: 234
+    EffectPath: Effects/Click
+    SoundPath: Sounds/Click
+    Position: {x: 0, y: 300}
+    Direction: 2
+    Speed: 250
+    DurationMs: 3000
+    StartPosition: {x: 0, y: 0}
+    EndPosition: {x: 0, y: 0}
+    Count: 0
+  - NoteType: 1
+    TimeMs: 5000
+    Score: 456
+    EffectPath: Effects/Click
+    SoundPath: Sounds/Click
+    Position: {x: 0, y: 0}
+    Direction: 0
+    Speed: 0
+    DurationMs: 3000
+    StartPosition: {x: -100, y: -100}
+    EndPosition: {x: 100, y: 100}
+    Count: 3
+  - NoteType: 0
+    TimeMs: 6000
+    Score: 789
+    EffectPath: Effects/Click
+    SoundPath: Sounds/Click
+    Position: {x: 0, y: -300}
+    Direction: 1
+    Speed: 300
+    DurationMs: 3000
+    StartPosition: {x: 0, y: 0}
+    EndPosition: {x: 0, y: 0}
+    Count: 0

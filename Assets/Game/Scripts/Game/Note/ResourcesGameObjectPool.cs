@@ -47,6 +47,7 @@ public class ResourcesGameObjectPool
             gob.transform.localScale = Vector3.one;
             gob.transform.localRotation = Quaternion.identity;
         }
+        gob.SetActive(true);
         return gob;
     }
 

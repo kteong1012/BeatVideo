@@ -1,8 +1,6 @@
 using Cysharp.Threading.Tasks;
-using Game.Cfg;
-using Game.Cfg.Game;
+
 using Luban;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -17,25 +15,19 @@ public class GameUI : MonoBehaviour
     #endregion
 
     #region Fields & Properties
-    private Game.Cfg.LevelConfig _levelConfig;
+    private LevelConfig _levelConfig;
     #endregion
 
     #region Magical Methods
-    private async void Start()
+    private void Start()
     {
-        var tables = new Tables();
-        await tables.LoadAll(async (tableName) =>
-        {
-            await UniTask.CompletedTask;
-            var bytes = Resources.Load<TextAsset>($"Config/Bytes/{tableName}").bytes;
-            return new ByteBuf(bytes);
-        });
-        StartGame(tables.TbLevelConfig.GetOrDefault(1)).Forget();
+        _levelConfig = Resources.Load<LevelConfig>("LevelConfig");
+        StartGame(_levelConfig).Forget();
     }
     #endregion
 
     #region Public Methods
-    public async UniTask StartGame(Game.Cfg.LevelConfig levelConfig)
+    public async UniTask StartGame(LevelConfig levelConfig)
     {
         _levelConfig = levelConfig;
         LoadVideo();
@@ -48,12 +40,15 @@ public class GameUI : MonoBehaviour
     #region Private Methods
     private void LoadVideo()
     {
-        var videoPath = _levelConfig.VideoPath;
-        // Load video from resources path
-        var videoClip = Resources.Load<VideoClip>(videoPath);
+        var videoClip = _levelConfig.Video;
         _videoPlayer.clip = videoClip;
         // Stop video
         _videoPlayer.Stop();
+
+        // set self size
+        var videoSize = new Vector2(videoClip.width, videoClip.height);
+        var rectTransform = transform as RectTransform;
+        rectTransform.sizeDelta = videoSize;
     }
     private async UniTask CountDown()
     {
@@ -74,18 +69,19 @@ public class GameUI : MonoBehaviour
         var noteUnits = _levelConfig.Notes.OrderBy(note => note.TimeMs);
         var tasks = new List<UniTask>();
 
+        var canvasSize = new Vector2(_videoPlayer.width, _videoPlayer.height);
         foreach (var noteUnit in noteUnits)
         {
-            if (noteUnit is SideNoteUnit sideNoteUnit)
+            if (noteUnit.NoteType == NoteType.SideNote)
             {
                 var creator = new SideNoteCreator();
-                var task = UniTask.Create(() => creator.Create(sideNoteUnit, _noteRoot));
+                var task = UniTask.Create(() => creator.Create(noteUnit, _noteRoot, canvasSize));
                 tasks.Add(task);
             }
-            else if (noteUnit is TrackNoteUnit trackNoteUnit)
+            else if (noteUnit.NoteType == NoteType.TrackNote)
             {
                 var creator = new TrackNoteCreator();
-                var task = UniTask.Create(() => creator.Create(trackNoteUnit, _noteRoot));
+                var task = UniTask.Create(() => creator.Create(noteUnit, _noteRoot, canvasSize));
                 tasks.Add(task);
             }
         }

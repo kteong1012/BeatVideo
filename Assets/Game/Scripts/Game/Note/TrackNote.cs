@@ -1,14 +1,13 @@
 ﻿using Cysharp.Threading.Tasks;
-using Game.Cfg.Game;
+
 using UnityEngine;
 
 public class TrackNote : Note
 {
-    private static ResourcesGameObjectPool _clickEffectPool = new ResourcesGameObjectPool("Effects/Click");
-    public TrackNoteUnit NoteUnit { get; set; }
+    public NoteUnit NoteUnit { get; set; }
 
     private bool _active;
-    public override void Show()
+    public override void Show(Vector2 _)
     {
         _active = true;
         WaitToFadeOut().Forget();
@@ -31,21 +30,21 @@ public class TrackNote : Note
 
         if (_active)
         {
-            Pool.Release(gameObject);
+            PoolManager.Instance.Release(TrackNoteCreator.TrackNotePrefabPath, gameObject);
             _active = false;
         }
     }
 
     private void OnClick()
     {
-        var effectGob = _clickEffectPool.Get(transform.parent);
+        var effectGob = PoolManager.Instance.Get(NoteUnit.EffectPath, transform.parent);
         var effect = effectGob.GetComponent<NoteClickEffect>();
         effect.transform.position = transform.position;
-        effect.Pool = _clickEffectPool;
+        SoundManager.Instance.PlaySound(Resources.Load<AudioClip>(NoteUnit.SoundPath));
 
         if (_active)
         {
-            Pool.Release(gameObject);
+            PoolManager.Instance.Release(TrackNoteCreator.TrackNotePrefabPath, gameObject);
             _active = false;
         }
     }

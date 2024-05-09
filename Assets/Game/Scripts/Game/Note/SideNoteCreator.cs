@@ -1,38 +1,43 @@
 ﻿using Cysharp.Threading.Tasks;
-using Game.Cfg.Game;
+
 using UnityEngine;
 
 
-public class SideNoteCreator : NoteCreator
+public class SideNoteCreator
 {
-    private static ResourcesGameObjectPool _sideNotePool = new ResourcesGameObjectPool("Prefabs/SideNote");
-    private SideNoteUnit _sideNoteUnit;
+    public static string SideNotePrefabPath ="Prefabs/SideNote";
+    private NoteUnit _sideNoteUnit;
 
-    public override async UniTask Create(NoteUnit noteUnit, Transform parent)
+    public async UniTask Create(NoteUnit noteUnit, Transform parent, Vector2 canvasSize)
     {
-        _sideNoteUnit = (SideNoteUnit)noteUnit;
+        _sideNoteUnit = noteUnit;
         var speed = _sideNoteUnit.Speed;
         var direction = _sideNoteUnit.Direction;
+        var halfHeight = canvasSize.y / 2;
+        var halfWidth = canvasSize.x / 2;
         var length = direction switch
         {
-            SideNoteDirection.Left => 360f - _sideNoteUnit.Position.x,
-            SideNoteDirection.Right => _sideNoteUnit.Position.x + 360f,
-            _ => 0f
+            NoteDirection.Left => halfWidth - _sideNoteUnit.Position.x,
+            NoteDirection.Right => _sideNoteUnit.Position.x + halfWidth,
+            NoteDirection.Down => halfHeight - _sideNoteUnit.Position.y,
+            NoteDirection.Up => _sideNoteUnit.Position.y + halfHeight,
+            _ => throw new System.ArgumentOutOfRangeException()
         };
         var flyTimeMs = length / speed * 1000;
         var showTimeMs = _sideNoteUnit.TimeMs - flyTimeMs;
         await UniTask.Delay((int)showTimeMs);
-        var gob = _sideNotePool.Get(parent);
+        var gob = PoolManager.Instance.Get(SideNotePrefabPath,parent);
         var startPostion = direction switch
         {
-            SideNoteDirection.Left => new Vector3(420, _sideNoteUnit.Position.y, 0),
-            SideNoteDirection.Right => new Vector3(-420, _sideNoteUnit.Position.y, 0),
-            _ => Vector3.zero
+            NoteDirection.Left => new Vector3(halfWidth, _sideNoteUnit.Position.y, 0),
+            NoteDirection.Right => new Vector3(-halfWidth, _sideNoteUnit.Position.y, 0),
+            NoteDirection.Down => new Vector3(_sideNoteUnit.Position.x, halfHeight, 0),
+            NoteDirection.Up => new Vector3(_sideNoteUnit.Position.x, -halfHeight, 0),
+            _ => throw new System.ArgumentOutOfRangeException()
         };
         gob.transform.localPosition = startPostion;
         var note = gob.GetComponent<SideNote>();
-        note.Pool = _sideNotePool;
         note.NoteUnit = _sideNoteUnit;
-        note.Show();
+        note.Show(canvasSize);
     }
 }
